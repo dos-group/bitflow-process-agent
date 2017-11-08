@@ -1,22 +1,28 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	"fmt"
-
+	"sort"
 	"strconv"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/antongulenko/go-bitflow-pipeline/http"
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	DefaultNewPipelineDelay = 200 * time.Millisecond
+	NewPipelineQuery        = "delay"
+)
+
 func (engine *SubprocessEngine) ServeHttp(endpoint string) error {
 	g := plotHttp.NewGinEngine()
 	g.GET("/capabilities", engine.serveCapabilities)
 	g.GET("/pipelines", engine.servePipelines)
+	g.GET("/running", engine.serveRunningPipelines)
 	g.POST("/pipeline", engine.serveNewPipeline)
 	g.GET("/pipeline/:id", engine.serveGetPipeline)
 	g.GET("/pipeline/:id/out", engine.serveGetPipelineOutput)
@@ -33,14 +39,29 @@ func (engine *SubprocessEngine) serveCapabilities(c *gin.Context) {
 	c.JSON(http.StatusOK, engine.capabilities)
 }
 
-func (engine *SubprocessEngine) servePipelines(c *gin.Context) {
+func (engine *SubprocessEngine) serveFilteredPipelineIds(c *gin.Context, accept func(*RunningPipeline) bool) {
 	engine.pipelinesLock.Lock()
 	response := make([]int, 0, len(engine.pipelines))
-	for id := range engine.pipelines {
-		response = append(response, id)
+	for _, pipe := range engine.pipelines {
+		if accept(pipe) {
+			response = append(response, pipe.Id)
+		}
 	}
 	engine.pipelinesLock.Unlock()
+	sort.Ints(response)
 	c.JSON(http.StatusOK, response)
+}
+
+func (engine *SubprocessEngine) servePipelines(c *gin.Context) {
+	engine.serveFilteredPipelineIds(c, func(*RunningPipeline) bool {
+		return true
+	})
+}
+
+func (engine *SubprocessEngine) serveRunningPipelines(c *gin.Context) {
+	engine.serveFilteredPipelineIds(c, func(pipe *RunningPipeline) bool {
+		return pipe.Status == StatusRunning
+	})
 }
 
 func (engine *SubprocessEngine) pipelineResponse(pipe *RunningPipeline) interface{} {
@@ -67,7 +88,18 @@ func (engine *SubprocessEngine) serveNewPipeline(c *gin.Context) {
 		return
 	}
 
-	pipeline, err := engine.NewPipeline(string(script))
+	delay := DefaultNewPipelineDelay
+	if delayStr := c.Query(NewPipelineQuery); delayStr != "" {
+		parsedDelay, err := time.ParseDuration(delayStr)
+		if err != nil {
+			engine.replyString(c, http.StatusBadRequest, "The parameter '%v' could not be parsed to a duration: %v. Example format: 500ms",
+				NewPipelineQuery, err)
+			return
+		}
+		delay = parsedDelay
+	}
+
+	pipeline, err := engine.NewPipeline(string(script), delay)
 	if err != nil {
 		engine.replyString(c, http.StatusBadRequest, "Error starting pipeline %v: %v", pipeline.Id, err.Error())
 	} else {
