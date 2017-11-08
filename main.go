@@ -24,9 +24,9 @@ const (
 
 func main() {
 	var executable, httpEndpoint, managerURL string
-	flag.StringVar(&executable, "e", "", fmt.Sprintf("Name of the pipeline executable. By default, search PATH for %v", defaultExecutableName))
-	flag.StringVar(&httpEndpoint, "h", ":8080", "HTTP endpoint for serving REST API")
-	flag.StringVar(&managerURL, "m", "", "After initializing the REST API, make a POST request with an empty body to the given URL")
+	flag.StringVar(&executable, "e", "", fmt.Sprintf("Name of the pipeline executable. By default, search $PATH for %v", defaultExecutableName))
+	flag.StringVar(&httpEndpoint, "h", ":8080", "HTTP endpoint for serving the REST API.")
+	flag.StringVar(&managerURL, "m", "", "After initializing the REST API, send a GET request with no further headers or content to the given URL.")
 	flag.Parse()
 
 	var err error

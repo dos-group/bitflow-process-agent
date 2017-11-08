@@ -101,7 +101,7 @@ func (engine *SubprocessEngine) serveNewPipeline(c *gin.Context) {
 
 	pipeline, err := engine.NewPipeline(string(script), delay)
 	if err != nil {
-		engine.replyString(c, http.StatusBadRequest, "Error starting pipeline %v: %v", pipeline.Id, err.Error())
+		engine.replyString(c, http.StatusPreconditionFailed, "Error starting pipeline %v: %v", pipeline.Id, err.Error())
 	} else {
 		c.JSON(http.StatusCreated, engine.pipelineResponse(pipeline))
 	}
@@ -134,7 +134,7 @@ func (engine *SubprocessEngine) serveKillPipeline(c *gin.Context) {
 		if err != nil {
 			engine.replyString(c, http.StatusInternalServerError, "Error killing pipeline %v: %v", pipe.Id, err)
 		} else {
-			engine.replyString(c, http.StatusOK, "Pipeline %v has been killed", pipe.Id)
+			c.JSON(http.StatusOK, pipe)
 		}
 	}
 }
