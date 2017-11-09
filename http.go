@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/antongulenko/go-bitflow-pipeline/http"
 	"github.com/gin-gonic/gin"
 )
