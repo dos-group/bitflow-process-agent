@@ -1,6 +1,6 @@
 # bitflow-process-agent
 
-This agent executes and manages subprocesses through a REST API. More specifically, it manages instances of [bitflow-pipeline](https://gitlab.tubit.tu-berlin.de/anton.gulenko/go-bitflow-pipeline/tree/master/bitflow-pipeline) that execute stream processing pipelines defined by [Bitflow Script](https://gitlab.tubit.tu-berlin.de/anton.gulenko/go-bitflow-pipeline/tree/master/query#bitflow-script).
+This agent executes and manages subprocesses through a REST API. More specifically, it manages instances of [bitflow-pipeline](https://gitlab.tubit.tu-berlin.de/anton.gulenko/go-bitflow-pipeline/tree/master/bitflow-pipeline) (also forked [here](https://gitlab.tubit.tu-berlin.de/cit-master-project/go-bitflow-pipeline)) that execute stream processing pipelines defined by [Bitflow Script](https://gitlab.tubit.tu-berlin.de/anton.gulenko/go-bitflow-pipeline/tree/master/query#bitflow-script).
 
 When starting, the agent performs the following steps:
 1. Query and store the capabilities of the used `bitflow-pipeline` executable. Invoke the executable with the `-capabilities` flag and parse the JSON output. Exit if the command fails or the output cannot be properly parsed. See the REST API section below for an example of the expected JSON format (the same format is served through the REST API).
