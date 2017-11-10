@@ -7,8 +7,9 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/antongulenko/go-bitflow-pipeline/query"
+	"github.com/shirou/gopsutil/cpu"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -22,6 +23,7 @@ const (
 
 type SubprocessEngine struct {
 	Executable string
+	Tags       map[string]string
 
 	capabilities  query.ProcessingSteps
 	pipelines     map[int]*RunningPipeline
@@ -29,6 +31,9 @@ type SubprocessEngine struct {
 
 	nextId     int
 	nextIdLock sync.Mutex
+
+	lastCpuTimes    []cpu.TimesStat
+	currentCpuUsage []float64
 }
 
 type RunningPipeline struct {
@@ -50,6 +55,7 @@ func (engine *SubprocessEngine) Run() (err error) {
 		return
 	}
 	engine.pipelines = make(map[int]*RunningPipeline)
+	go engine.ObserveCpuTimes()
 	return nil
 }
 

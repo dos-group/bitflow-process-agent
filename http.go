@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/antongulenko/go-bitflow-pipeline/http"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -20,6 +20,8 @@ const (
 
 func (engine *SubprocessEngine) ServeHttp(endpoint string) error {
 	g := plotHttp.NewGinEngine()
+	g.GET("/ping", engine.servePing)
+	g.GET("/info", engine.serveInfo)
 	g.GET("/capabilities", engine.serveCapabilities)
 	g.GET("/pipelines", engine.servePipelines)
 	g.GET("/running", engine.serveRunningPipelines)
@@ -33,6 +35,14 @@ func (engine *SubprocessEngine) ServeHttp(endpoint string) error {
 func (engine *SubprocessEngine) replyString(c *gin.Context, code int, format string, args ...interface{}) {
 	c.Status(code)
 	c.Writer.WriteString(fmt.Sprintf(format+"\n", args...))
+}
+
+func (engine *SubprocessEngine) servePing(c *gin.Context) {
+	engine.replyString(c, http.StatusOK, "pong")
+}
+
+func (engine *SubprocessEngine) serveInfo(c *gin.Context) {
+	c.JSON(http.StatusOK, engine.getInfo())
 }
 
 func (engine *SubprocessEngine) serveCapabilities(c *gin.Context) {

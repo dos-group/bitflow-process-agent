@@ -11,9 +11,9 @@ import (
 	"net/http"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/antongulenko/go-bitflow-pipeline/query"
 	"github.com/antongulenko/golib"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -24,9 +24,11 @@ const (
 
 func main() {
 	var executable, httpEndpoint, managerURL string
+	var agentTags golib.KeyValueStringSlice
 	flag.StringVar(&executable, "e", "", fmt.Sprintf("Name of the pipeline executable. By default, search $PATH for %v", defaultExecutableName))
 	flag.StringVar(&httpEndpoint, "h", ":8080", "HTTP endpoint for serving the REST API.")
 	flag.StringVar(&managerURL, "m", "", "After initializing the REST API, send a GET request with no further headers or content to the given URL.")
+	flag.Var(&agentTags, "tag", "Additional key=value pairs that will be served through GET /info.")
 	flag.Parse()
 
 	var err error
@@ -38,6 +40,7 @@ func main() {
 
 	engine := SubprocessEngine{
 		Executable: executable,
+		Tags:       agentTags.Map(),
 	}
 	golib.Checkerr(engine.Run())
 	if managerURL != "" {

@@ -18,9 +18,46 @@ All flags are optional (see the default values).
       
 **`-m url`** After initializing the REST API, send a GET request with an empty body and no further headers to the given URL. Any parameters or options needed by the manager must be encoded in query parameters (e.g. `-m 'http://manager.com/registeragent?ip=10.0.0.1&port=5555'`).
 
+**`-tag key=value`** Additional key=value pairs that will be served through GET /info.
+
 ## REST API
 
 In general, the status code `404` is returned when an unexpected path or request verb is used. Whenever the status code is not success (`200` or `201`), the response will be an unformatted string explaining the error. The response format of the success status codes depends on the API function, but is usually unindented JSON.
+
+##### `GET /ping`
+Returns the string `pong`. Can be used as a low-overhead alive-test.
+
+Status code: `200`.
+
+##### `GET /info`
+Returns information about the agent and the host. Both static and dynamically changing information is served.
+The returned `Tags` property is filled from the `-tag` command line flags defined when starting the agent.
+The tags can be used to classify or tag the host type, used by the end-user or for scheduling decisions.
+
+Status code: `200`.
+
+Example response body:
+```
+{
+  "Hostname": "worker12",
+  "Tags": {
+    "resources": "medium",
+    "slots": "6"
+  },
+  "NumCores": 4,
+  "TotalMem": 8254799872,
+  "UsedCpuCores": [
+    3.960396039350753,
+    2.970297029767164,
+    2.0000000000436557,
+    2.0202020202428503
+  ],
+  "UsedCpu": 2.7377237723511056,
+  "UsedMem": 6126739456,
+  "NumProcs": 247,
+  "Goroutines": 6
+}
+```
 
 ##### `GET /capabilities`
 Return the capabilities of the managed `bitflow-pipeline` executable. The returned value is the same that is printed when executing `bitflow-pipeline -capabilities`. The JSON structure contains all pipeline processing steps that can be used in the [Bitflow Script](https://gitlab.tubit.tu-berlin.de/anton.gulenko/go-bitflow-pipeline/tree/master/query#bitflow-script) when starting a new pipeline instance.
