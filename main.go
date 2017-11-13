@@ -29,7 +29,9 @@ func main() {
 	flag.StringVar(&httpEndpoint, "h", ":8080", "HTTP endpoint for serving the REST API.")
 	flag.StringVar(&managerURL, "m", "", "After initializing the REST API, send a GET request with no further headers or content to the given URL.")
 	flag.Var(&agentTags, "tag", "Additional key=value pairs that will be served through GET /info.")
+	golib.RegisterLogFlags()
 	flag.Parse()
+	golib.ConfigureLogging()
 
 	var err error
 	if executable == "" {

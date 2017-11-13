@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/antongulenko/go-bitflow-pipeline/http"
+	"github.com/antongulenko/golib"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
@@ -19,7 +19,7 @@ const (
 )
 
 func (engine *SubprocessEngine) ServeHttp(endpoint string) error {
-	g := plotHttp.NewGinEngine()
+	g := golib.NewGinEngine()
 	g.GET("/ping", engine.servePing)
 	g.GET("/info", engine.serveInfo)
 	g.GET("/capabilities", engine.serveCapabilities)
