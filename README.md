@@ -15,7 +15,7 @@ All flags are optional (see the default values).
 **`-e file`** Name of the pipeline executable. By default, search `$PATH` for `bitflow-pipeline`.
 
 **`-h tcp-endpoint`** HTTP endpoint for serving REST API (default `:8080`).
-      
+
 **`-m url`** After initializing the REST API, send a GET request with an empty body and no further headers to the given URL. Any parameters or options needed by the manager must be encoded in query parameters (e.g. `-m 'http://manager.com/registeragent?ip=10.0.0.1&port=5555'`).
 
 **`-tag key=value`** Additional key=value pairs that will be served through GET /info.
@@ -117,8 +117,8 @@ Example response body:
 [3,5]
 ```
 
-##### `POST /pipeline[?delay=200ms]`
-Create a new pipeline subprocess. The id of the pipeline will be assigned automatically. The body of the POST request is entirely used as the [Bitflow Script](https://gitlab.tubit.tu-berlin.de/anton.gulenko/go-bitflow-pipeline/tree/master/query#bitflow-script). The `delay` query parameter is optional, the default value is `200ms`. It is parsed by [time.ParseDuration](https://golang.org/pkg/time/#ParseDuration). If the `delay` value is greater than zero, the server waits for the given interval after spawning the subprocess before sending the HTTP response. If the subprocess exits abnormally before the given interval, the response will contain the combined standard output and standard error of the subprocess.
+##### `POST /pipeline[?delay=200ms&params=xxx]`
+Create a new pipeline subprocess. The id of the pipeline will be assigned automatically. The body of the POST request is entirely used as the [Bitflow Script](https://gitlab.tubit.tu-berlin.de/anton.gulenko/go-bitflow-pipeline/tree/master/query#bitflow-script). The `delay` query parameter is optional, the default value is `200ms`. It is parsed by [time.ParseDuration](https://golang.org/pkg/time/#ParseDuration). If the `delay` value is greater than zero, the server waits for the given interval after spawning the subprocess before sending the HTTP response. If the subprocess exits abnormally before the given interval, the response will contain the combined standard output and standard error of the subprocess. The `params` query parameter is also optional. It can be provided to pass parameters to the resulting pipeline process. The possible parameters depend on the actual pipeline executable, wrong parameters will likely prevent the pipeline from starting. The value of the `params` query parameter is parsed by [shellquote.Split](https://godoc.org/github.com/kballard/go-shellquote#Split), which splits the string into individual parameters following the rules of `/bin/sh`, including single quotes, double quotes and backslash escapes. This way multiple parameters can be passed through a single query parameter value.
 
 Status code: `201`
 * If the subprocess is spawned successfully and does not fail early.
@@ -159,7 +159,7 @@ Example response body:
 
 Example response body:
 ```
-{"Id":2,"Script":":1","Status":"failed","Errors":"exit status 1"}
+{"Id":2,"Script":":1","ExtraParams":[],"Status":"failed","Errors":"exit status 1"}
 ```
 
 Status code: `400`

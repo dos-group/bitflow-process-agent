@@ -10,12 +10,14 @@ import (
 
 	"github.com/antongulenko/golib"
 	"github.com/gin-gonic/gin"
+	shellquote "github.com/kballard/go-shellquote"
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	DefaultNewPipelineDelay = 200 * time.Millisecond
-	NewPipelineQuery        = "delay"
+	DefaultNewPipelineDelay    = 200 * time.Millisecond
+	NewPipelineDelayQuery      = "delay"
+	NewPipelineParametersQuery = "params"
 )
 
 func (engine *SubprocessEngine) ServeHttp(endpoint string) error {
@@ -99,17 +101,28 @@ func (engine *SubprocessEngine) serveNewPipeline(c *gin.Context) {
 	}
 
 	delay := DefaultNewPipelineDelay
-	if delayStr := c.Query(NewPipelineQuery); delayStr != "" {
+	if delayStr := c.Query(NewPipelineDelayQuery); delayStr != "" {
 		parsedDelay, err := time.ParseDuration(delayStr)
 		if err != nil {
 			engine.replyString(c, http.StatusBadRequest, "The parameter '%v' could not be parsed to a duration: %v. Example format: 500ms",
-				NewPipelineQuery, err)
+				NewPipelineDelayQuery, err)
 			return
 		}
 		delay = parsedDelay
 	}
 
-	pipeline, err := engine.NewPipeline(string(script), delay)
+	var extraParams []string
+	if extraParamString := c.Query(NewPipelineParametersQuery); extraParamString != "" {
+		extraParamsSplit, err := shellquote.Split(extraParamString)
+		if err != nil {
+			engine.replyString(c, http.StatusBadRequest, "The parameter '%v' could not be split into shell parameters: %v. The quote syntax must follow /bin/sh.",
+				NewPipelineParametersQuery, err)
+			return
+		}
+		extraParams = extraParamsSplit
+	}
+
+	pipeline, err := engine.NewPipeline(string(script), delay, extraParams)
 	if err != nil {
 		engine.replyString(c, http.StatusPreconditionFailed, "Error starting pipeline %v: %v", pipeline.Id, err.Error())
 	} else {

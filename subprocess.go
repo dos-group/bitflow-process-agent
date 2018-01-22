@@ -37,10 +37,11 @@ type SubprocessEngine struct {
 }
 
 type RunningPipeline struct {
-	Id     int
-	Script string
-	Status string
-	Errors string
+	Id          int
+	Script      string
+	ExtraParams []string
+	Status      string
+	Errors      string
 
 	// Not exported in JSON
 	engine *SubprocessEngine
@@ -59,12 +60,13 @@ func (engine *SubprocessEngine) Run() (err error) {
 	return nil
 }
 
-func (engine *SubprocessEngine) NewPipeline(script string, delay time.Duration) (*RunningPipeline, error) {
+func (engine *SubprocessEngine) NewPipeline(script string, delay time.Duration, extraParams []string) (*RunningPipeline, error) {
 	pipe := &RunningPipeline{
-		Id:     engine.getNextId(),
-		Script: script,
-		Status: StatusCreated,
-		engine: engine,
+		Id:          engine.getNextId(),
+		Script:      script,
+		ExtraParams: extraParams,
+		Status:      StatusCreated,
+		engine:      engine,
 	}
 	engine.pipelinesLock.Lock()
 	engine.pipelines[pipe.Id] = pipe
@@ -97,7 +99,7 @@ func (pipe *RunningPipeline) Run() error {
 	}
 
 	// The space in front of the script is to avoid the script to be confused with a flag that starts with -
-	pipe.cmd = exec.Command(pipe.engine.Executable, " "+pipe.Script)
+	pipe.cmd = exec.Command(pipe.engine.Executable, append(pipe.ExtraParams, " "+pipe.Script)...)
 	pipe.cmd.Stderr = &pipe.output
 	pipe.cmd.Stdout = &pipe.output
 	err := pipe.cmd.Start()
