@@ -18,7 +18,6 @@ import (
 
 const (
 	defaultExecutableName      = "bitflow-pipeline"
-	managerNotificationDelay   = 200 * time.Millisecond
 	managerNotificationTimeout = 2000 * time.Millisecond
 )
 

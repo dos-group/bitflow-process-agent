@@ -10,7 +10,7 @@ import (
 
 	"github.com/antongulenko/golib"
 	"github.com/gin-gonic/gin"
-	shellquote "github.com/kballard/go-shellquote"
+	"github.com/kballard/go-shellquote"
 	log "github.com/sirupsen/logrus"
 )
 
