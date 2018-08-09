@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"os"
-	"os/exec"
-
 	"io/ioutil"
 	"net/http"
+	"os"
+	"os/exec"
 	"time"
 
 	"github.com/antongulenko/go-bitflow-pipeline/query"
