@@ -10,7 +10,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/antongulenko/go-bitflow-pipeline/query"
+	"github.com/antongulenko/go-bitflow-pipeline/bitflow-script/reg"
 	"github.com/antongulenko/golib"
 	log "github.com/sirupsen/logrus"
 )
@@ -51,7 +51,7 @@ func main() {
 
 const CapabilitiesFlag = "-capabilities"
 
-func LoadCapabilities(executable string) (obj query.ProcessingSteps, err error) {
+func LoadCapabilities(executable string) (obj reg.ProcessingSteps, err error) {
 	var output []byte
 	cmd := exec.Command(executable, CapabilitiesFlag)
 	cmd.Stderr = os.Stderr

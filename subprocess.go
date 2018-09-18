@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/antongulenko/go-bitflow-pipeline/query"
+	"github.com/antongulenko/go-bitflow-pipeline/bitflow-script/reg"
 	"github.com/shirou/gopsutil/cpu"
 	log "github.com/sirupsen/logrus"
 )
@@ -25,7 +25,7 @@ type SubprocessEngine struct {
 	Executable string
 	Tags       map[string]string
 
-	capabilities  query.ProcessingSteps
+	capabilities  reg.ProcessingSteps
 	pipelines     map[int]*RunningPipeline
 	pipelinesLock sync.Mutex
 
