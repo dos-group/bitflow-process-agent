@@ -208,6 +208,6 @@ Status code: `500`.
 * If the subprocess could not be killed. In this case the subprocess might still be running and might require manual cleanup (see Current limitations).
 
 ## Current limitations
-* No persistency. When the agent is restarted, it forgets about previously running subprocesses. If they are still running, they must be killed externally.
+* No persistence. When the agent is restarted, it forgets about previously running subprocesses. If they are still running, they must be killed externally.
 * Limited process management. If a subprocess does not terminate normally (after a SIGKILL), cleaning up the subprocess is not further enforced.
 * Leaking memory. The output and metadata of every started subprocess is stored in memory indefinitely.
