@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/antongulenko/go-bitflow-pipeline/bitflow-script/reg"
+	"github.com/bitflow-stream/go-bitflow-pipeline/script/reg"
 	"github.com/shirou/gopsutil/cpu"
 	log "github.com/sirupsen/logrus"
 )

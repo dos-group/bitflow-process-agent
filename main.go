@@ -10,8 +10,8 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/antongulenko/go-bitflow-pipeline/bitflow-script/reg"
 	"github.com/antongulenko/golib"
+	"github.com/bitflow-stream/go-bitflow-pipeline/script/reg"
 	log "github.com/sirupsen/logrus"
 )
 
